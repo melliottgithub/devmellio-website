@@ -1,3 +1,4 @@
+import WorkflowDiagram from './WorkflowDiagram'
 export default function Hero() {
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
@@ -77,56 +78,8 @@ export default function Hero() {
 
           {/* Right: Visual - Hidden on mobile, shows on tablet+ */}
           <div className="hidden lg:block animate-slide-in-right">
-            {/* Glassmorphism Card with Demo Preview */}
-            <div className="relative group">
-              {/* Glass Card */}
-              <div className="relative bg-white/40 backdrop-blur-lg border border-white/20 rounded-3xl p-8 shadow-2xl">
-                {/* Video Placeholder */}
-                <div className="aspect-video bg-gradient-to-br from-primary-100 to-accent-100 rounded-2xl flex items-center justify-center overflow-hidden group-hover:scale-[1.02] transition-transform duration-300">
-                  {/* Play Button Overlay */}
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-sm">
-                    <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
-                      <svg className="w-10 h-10 text-primary-600 ml-1" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
-                    </div>
-                  </div>
-
-                  {/* Mockup Content */}
-                  <div className="absolute inset-0 p-6 text-left">
-                    <div className="space-y-3">
-                      <div className="h-4 bg-white/60 rounded w-3/4"></div>
-                      <div className="h-4 bg-white/40 rounded w-1/2"></div>
-                      <div className="h-32 bg-white/30 rounded mt-4"></div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Stats Row */}
-                <div className="grid grid-cols-3 gap-4 mt-6">
-                  <div className="text-center p-3 bg-white/60 backdrop-blur-sm rounded-xl">
-                    <div className="text-2xl font-bold text-primary-600">20+</div>
-                    <div className="text-xs text-gray-600 mt-1">Hours Saved</div>
-                  </div>
-                  <div className="text-center p-3 bg-white/60 backdrop-blur-sm rounded-xl">
-                    <div className="text-2xl font-bold text-accent-600">3-14</div>
-                    <div className="text-xs text-gray-600 mt-1">Days Setup</div>
-                  </div>
-                  <div className="text-center p-3 bg-white/60 backdrop-blur-sm rounded-xl">
-                    <div className="text-2xl font-bold text-gray-900">90%</div>
-                    <div className="text-xs text-gray-600 mt-1">Less Errors</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Decorative Elements */}
-              <div className="absolute -top-4 -right-4 w-24 h-24 bg-accent-400/20 rounded-full blur-2xl"></div>
-              <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-primary-400/20 rounded-full blur-2xl"></div>
-            </div>
+            <WorkflowDiagram />
           </div>
-        </div>
-      </div>
-
       {/* Scroll Indicator - Hidden on mobile */}
       <div className="hidden lg:block absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
         <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
