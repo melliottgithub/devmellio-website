@@ -34,7 +34,7 @@ jobs:
 
       - name: Deploy to S3
         run: |
-          aws s3 sync dist/ s3://devmellio.com --delete \
+          aws s3 sync dist/ s3://devmellio-site --delete \
             --cache-control "public,max-age=31536000,immutable" \
             --exclude "index.html" \
             --exclude "*.html"
@@ -42,7 +42,7 @@ jobs:
       - name: Upload HTML files without cache
         run: |
           find dist -name "*.html" -type f | while read file; do
-            aws s3 cp "$file" "s3://devmellio.com/${file#dist/}" \
+            aws s3 cp "$file" "s3://devmellio-site/${file#dist/}" \
               --cache-control "public,max-age=0,must-revalidate" \
               --content-type "text/html"
           done
