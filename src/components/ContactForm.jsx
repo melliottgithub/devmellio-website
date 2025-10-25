@@ -5,7 +5,8 @@ export default function ContactForm() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    automationNeed: ''
+    automationNeed: '',
+    honeypot: '' // Bot detection field - must remain empty
   })
   const [errors, setErrors] = useState({})
   const [touched, setTouched] = useState({})
@@ -78,7 +79,8 @@ export default function ContactForm() {
       body: JSON.stringify({
         name: formData.name,
         email: formData.email,
-        need: formData.automationNeed
+        need: formData.automationNeed,
+        honeypot: formData.honeypot
       }),
       signal: controller.signal
     })
@@ -90,9 +92,18 @@ export default function ContactForm() {
       if (response.status === 500) {
         throw new Error('Server error. We may have saved your information. Check your email or contact devmellio@gmail.com')
       } else if (response.status === 400) {
-        throw new Error(errorData.detail || 'Invalid form data. Please check your inputs.')
+        // Handle specific validation errors
+        const errorMsg = errorData.detail || 'Invalid form data. Please check your inputs.'
+        if (errorMsg.includes('honeypot') || errorMsg.includes('Invalid submission')) {
+          throw new Error('There was a problem with your submission. Please try again or email devmellio@gmail.com')
+        } else if (errorMsg.includes('Disposable email')) {
+          throw new Error('Please use a permanent email address (temporary email services are not allowed)')
+        } else if (errorMsg.includes('inappropriate content')) {
+          throw new Error('Your message contains words that triggered our spam filter. Please rephrase and try again.')
+        }
+        throw new Error(errorMsg)
       } else if (response.status === 429) {
-        throw new Error('Too many requests. Please wait a minute and try again.')
+        throw new Error("You've submitted too many forms. Please try again in an hour or email devmellio@gmail.com directly.")
       } else {
         throw new Error(errorData.detail || 'Failed to submit form')
       }
@@ -164,7 +175,7 @@ export default function ContactForm() {
         if (data.success) {
           setAiResponse(data)
           // Clear form inputs after successful submission
-          setFormData({ name: '', email: '', automationNeed: '' })
+          setFormData({ name: '', email: '', automationNeed: '', honeypot: '' })
           setErrors({})
           setTouched({})
           setRetryCount(0)
@@ -318,6 +329,20 @@ export default function ContactForm() {
                       {errors.email}
                     </p>
                   )}
+                </div>
+
+                {/* Honeypot Field - Hidden from humans, visible to bots */}
+                <div style={{ position: 'absolute', left: '-5000px' }} aria-hidden="true">
+                  <label htmlFor="website">Website (leave blank)</label>
+                  <input
+                    type="text"
+                    id="website"
+                    name="honeypot"
+                    value={formData.honeypot}
+                    onChange={handleChange}
+                    tabIndex="-1"
+                    autoComplete="off"
+                  />
                 </div>
 
                 {/* Automation Need Field */}
