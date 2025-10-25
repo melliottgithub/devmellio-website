@@ -37,11 +37,31 @@ export default function Hero() {
 
             {/* CTAs */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
-              <Button variant="primary" size="md" icon={<ArrowIcon />}>
+              <Button
+                variant="primary"
+                size="md"
+                icon={<ArrowIcon />}
+                onClick={() => {
+                  const demoSection = document.getElementById('demos')
+                  if (demoSection) {
+                    demoSection.scrollIntoView({ behavior: 'smooth' })
+                  }
+                }}
+              >
                 See How It Works
               </Button>
 
-              <Button variant="secondary" size="md" icon={<ArrowIcon />}>
+              <Button
+                variant="secondary"
+                size="md"
+                icon={<ArrowIcon />}
+                onClick={() => {
+                  const contactSection = document.getElementById('contact')
+                  if (contactSection) {
+                    contactSection.scrollIntoView({ behavior: 'smooth' })
+                  }
+                }}
+              >
                 Get Free Automation Audit
               </Button>
             </div>
