@@ -58,6 +58,19 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
     }
   }, [aiResponse, hasAnimated])
 
+  // Scroll to success message when booking is confirmed
+  useEffect(() => {
+    if (meetingScheduled) {
+      requestAnimationFrame(() => {
+        const successEl = document.getElementById('booking-success')
+        if (successEl) {
+          successEl.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' })
+        }
+      })
+    }
+  }, [meetingScheduled])
 
   // Initialize Cal.com inline widget when ready (loads in background)
   useEffect(() => {
@@ -73,11 +86,6 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
         callback: (e) => {
           setMeetingScheduled(true)
           setScheduledEventData(e.detail)
-
-          // Scroll to top to show success message
-          requestAnimationFrame(() => {
-            window.scrollTo({ top: 0, behavior: 'smooth' })
-          })
 
           // Track conversion event in Google Analytics (if available)
           if (window.gtag) {
@@ -747,7 +755,7 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
           </div>
           {meetingScheduled ? (
             /* Meeting Scheduled Success View */
-            <div className="sm:bg-gradient-to-br sm:from-green-50 sm:to-primary-50 sm:border-2 sm:border-green-200 sm:rounded-3xl sm:shadow-xl p-4 sm:p-8 md:p-10 text-center relative z-[999999] bg-white"
+            <div id="booking-success" className="sm:bg-gradient-to-br sm:from-green-50 sm:to-primary-50 sm:border-2 sm:border-green-200 sm:rounded-3xl sm:shadow-xl p-4 sm:p-8 md:p-10 text-center relative z-[999999] bg-white"
               style={{ position: 'relative', zIndex: 999999, backgroundColor: 'white' }}>
               <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">You're All Set! 🎉</h3>
               <p className="text-lg text-gray-700 mb-6">
