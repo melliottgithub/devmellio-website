@@ -532,6 +532,7 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
           </div>
 
           {/* Form - Show when user clicks "Get your automation audit" */}
+          <div style={{ height: showForm && !aiResponse && !showCalendar && !meetingScheduled ? 'auto' : '0', overflow: 'hidden' }}>
           {!aiResponse && !showCalendar && !meetingScheduled && showForm ? (
             <form id="contact-form" onSubmit={handleSubmit} className={`space-y-6 ${!hasAnimated ? 'animate-fade-in-up' : ''}`} style={!hasAnimated ? { animationDelay: '0.1s' } : {}}>
               {/* Card Container */}
@@ -789,7 +790,9 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
                 </div>
               </div>
             </form>
-          ) : aiResponse ? (
+          ) : null}
+          </div>
+          {aiResponse ? (
             /* AI Response Display */
             <div className="animate-fade-in-up">
               {!showCalendar ? (
