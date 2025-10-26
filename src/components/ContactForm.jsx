@@ -451,8 +451,10 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
           {/* Calendly Widget - ALWAYS in DOM, loads in background */}
           <div
             id="calendly-widget"
-            className="-mx-4 sm:mx-0 relative"
+            className="-mx-4 sm:mx-0"
             style={{
+              position: showCalendar || meetingScheduled ? 'relative' : 'absolute',
+              left: showCalendar || meetingScheduled ? '0' : '-9999px',
               height: showCalendar || meetingScheduled ? 'auto' : '0',
               overflow: 'visible'
             }}
