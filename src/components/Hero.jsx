@@ -42,20 +42,6 @@ export default function Hero() {
                 size="md"
                 icon={<ArrowIcon />}
                 onClick={() => {
-                  const demoSection = document.getElementById('demos')
-                  if (demoSection) {
-                    demoSection.scrollIntoView({ behavior: 'smooth' })
-                  }
-                }}
-              >
-                See How It Works
-              </Button>
-
-              <Button
-                variant="secondary"
-                size="md"
-                icon={<ArrowIcon />}
-                onClick={() => {
                   const contactSection = document.getElementById('contact')
                   if (contactSection) {
                     contactSection.scrollIntoView({ behavior: 'smooth' })
