@@ -1,12 +1,63 @@
+import { useState, useEffect } from 'react'
 import WorkflowDiagram from './WorkflowDiagram'
 import { Button, Container, Section } from './ui'
 
 export default function Hero() {
+  const [stats, setStats] = useState(null)
+  const [currentStatIndex, setCurrentStatIndex] = useState(0)
+
+  useEffect(() => {
+    fetch('https://w3o3gzmmwa.execute-api.us-east-1.amazonaws.com/prod/stats/public')
+      .then(r => r.json())
+      .then(data => setStats(data))
+      .catch(err => console.error('Failed to load stats:', err))
+  }, [])
+
+  // Auto-rotate stats every 3 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentStatIndex(prev => (prev + 1) % 3)
+    }, 3000)
+    return () => clearInterval(interval)
+  }, [])
+
   const ArrowIcon = () => (
     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
     </svg>
   )
+
+  const statsData = [
+    {
+      icon: (
+        <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      ),
+      bgColor: 'bg-primary-100',
+      text: stats ? `${stats.hours_weekly_potential}+ hours/week opportunities identified` : '165+ hours/week opportunities identified'
+    },
+    {
+      icon: (
+        <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      ),
+      bgColor: 'bg-green-100',
+      text: stats ? `$${Math.round(stats.cost_savings_annual_potential / 1000)}K+ in annual savings potential` : '$354K+ in annual savings potential'
+    },
+    {
+      icon: (
+        <svg className="w-6 h-6 text-accent-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      ),
+      bgColor: 'bg-accent-100',
+      text: stats ? `${stats.opportunities_analyzed}+ automation opportunities analyzed` : '14+ automation opportunities analyzed'
+    }
+  ]
+
+  const currentStat = statsData[currentStatIndex]
 
   return (
     <Section background="gradient" spacing="lg" className="min-h-screen flex items-center overflow-hidden">
@@ -52,23 +103,37 @@ export default function Hero() {
               </Button>
             </div>
 
-            {/* Social Proof */}
-            <div className="pt-8 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-6 text-sm text-gray-600">
-              <div className="flex items-center gap-2">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary-100">
-                  <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+            {/* Social Proof - Rotating Stats Carousel */}
+            <div className="pt-8 flex items-center justify-center lg:justify-start">
+              <div className="relative flex items-center gap-3 min-h-[60px]">
+                {/* Animated stat display */}
+                <div
+                  key={currentStatIndex}
+                  className="flex items-center gap-3 animate-fade-in"
+                >
+                  <div className={`flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full ${currentStat.bgColor} transition-colors duration-500`}>
+                    {currentStat.icon}
+                  </div>
+                  <span className="font-medium text-sm sm:text-base text-gray-700 max-w-xs sm:max-w-md">
+                    {currentStat.text}
+                  </span>
                 </div>
-                <span className="font-medium">500+ hours saved for clients</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-accent-100">
-                  <svg className="w-6 h-6 text-accent-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+
+                {/* Dots indicator */}
+                <div className="flex gap-1.5 ml-2">
+                  {statsData.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setCurrentStatIndex(idx)}
+                      className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                        idx === currentStatIndex
+                          ? 'bg-primary-600 w-6'
+                          : 'bg-gray-300 hover:bg-gray-400'
+                      }`}
+                      aria-label={`View stat ${idx + 1}`}
+                    />
+                  ))}
                 </div>
-                <span className="font-medium">36+ projects analyzed</span>
               </div>
             </div>
           </div>

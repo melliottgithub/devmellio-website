@@ -16,6 +16,10 @@ export default function ContactForm() {
   const [hasAnimated, setHasAnimated] = useState(false)
   const [isSlowResponse, setIsSlowResponse] = useState(false)
   const [retryCount, setRetryCount] = useState(0)
+  const [showCalendar, setShowCalendar] = useState(false)
+  const [calendlyLoaded, setCalendlyLoaded] = useState(false)
+  const [meetingScheduled, setMeetingScheduled] = useState(false)
+  const [scheduledEventData, setScheduledEventData] = useState(null)
 
   // Mark as animated after first render
   useEffect(() => {
@@ -23,6 +27,106 @@ export default function ContactForm() {
       setHasAnimated(true)
     }
   }, [aiResponse, hasAnimated])
+
+  // DESTROY ALL CALENDLY when meeting is scheduled
+  useEffect(() => {
+    if (meetingScheduled) {
+      const nukeAllCalendly = () => {
+        const allElements = document.querySelectorAll('*')
+        allElements.forEach(el => {
+          const className = el.className
+          if (className && typeof className === 'string' && className.includes('calendly')) {
+            el.remove()
+          }
+        })
+      }
+
+      nukeAllCalendly()
+      const nukingInterval = setInterval(nukeAllCalendly, 100)
+
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          mutation.addedNodes.forEach((node) => {
+            if (node.nodeType === 1) {
+              const element = node
+              if (element.className && typeof element.className === 'string' &&
+                  element.className.includes('calendly')) {
+                element.remove()
+              }
+            }
+          })
+        })
+      })
+
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true
+      })
+
+      return () => {
+        clearInterval(nukingInterval)
+        observer.disconnect()
+      }
+    }
+  }, [meetingScheduled])
+
+  // Initialize Calendly inline widget when calendar is shown
+  useEffect(() => {
+    if (showCalendar && window.Calendly) {
+      setCalendlyLoaded(false)
+
+      // Listen for Calendly events
+      const handleCalendlyMessage = (e) => {
+        if (e.data.event && e.data.event.indexOf('calendly') === 0) {
+          // Hide skeleton on event_type_viewed (page fully loaded)
+          if (e.data.event === 'calendly.event_type_viewed') {
+            setCalendlyLoaded(true)
+          }
+
+          // Capture when meeting is scheduled
+          if (e.data.event === 'calendly.event_scheduled') {
+            setMeetingScheduled(true)
+            setScheduledEventData(e.data.payload)
+
+            // Track conversion event in Google Analytics (if available)
+            if (window.gtag) {
+              window.gtag('event', 'meeting_scheduled', {
+                event_category: 'conversion',
+                event_label: 'strategy_call',
+                value: 1
+              })
+            }
+
+            // Send booking data to backend
+            fetch('https://w3o3gzmmwa.execute-api.us-east-1.amazonaws.com/prod/booking', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                calendly_event: e.data.payload,
+                lead_id: aiResponse?.lead_id
+              })
+            })
+              .then(r => r.json())
+              .catch(err => console.error('Failed to save booking:', err))
+          }
+        }
+      }
+
+      window.addEventListener('message', handleCalendlyMessage)
+
+      // Initialize Calendly widget
+      window.Calendly.initInlineWidget({
+        url: 'https://calendly.com/kllmmc23/30min',
+        parentElement: document.querySelector('.calendly-inline-widget'),
+        prefill: {},
+        utm: {}
+      })
+
+      return () => {
+        window.removeEventListener('message', handleCalendlyMessage)
+      }
+    }
+  }, [showCalendar])
 
   // Validation functions
   const validate = {
@@ -179,6 +283,8 @@ export default function ContactForm() {
           setErrors({})
           setTouched({})
           setRetryCount(0)
+          setIsSubmitting(false)
+          setIsSlowResponse(false)
         } else {
           throw new Error(data.message || 'Failed to submit form')
         }
@@ -215,14 +321,10 @@ export default function ContactForm() {
         }
 
         // DON'T clear form data on error - preserve it!
+        setIsSubmitting(false)
+        setIsSlowResponse(false)
         break
       }
-    }
-
-    // Clean up submission state
-    if (attempts >= maxAttempts || aiResponse) {
-      setIsSubmitting(false)
-      setIsSlowResponse(false)
     }
   }
 
@@ -245,13 +347,14 @@ export default function ContactForm() {
               </svg>
               AI-Powered Analysis in 3 Seconds
             </div>
+
           </div>
 
           {/* Form or AI Response */}
           {!aiResponse ? (
             <form onSubmit={handleSubmit} className={`space-y-6 ${!hasAnimated ? 'animate-fade-in-up' : ''}`} style={!hasAnimated ? { animationDelay: '0.1s' } : {}}>
               {/* Card Container */}
-              <div className={`bg-white/80 backdrop-blur-sm border border-gray-200 rounded-3xl p-8 md:p-10 shadow-lg relative ${isSubmitting ? 'opacity-60 pointer-events-none' : ''}`}>
+              <div className={`sm:bg-white/80 sm:backdrop-blur-sm sm:border sm:border-gray-200 sm:rounded-3xl p-4 sm:p-8 md:p-10 sm:shadow-lg relative ${isSubmitting ? 'opacity-60 pointer-events-none' : ''}`}>
                 {/* Loading Overlay */}
                 {isSubmitting && (
                   <div className="absolute inset-0 flex items-center justify-center bg-white/50 backdrop-blur-sm rounded-3xl z-10">
@@ -508,19 +611,21 @@ export default function ContactForm() {
           ) : (
             /* AI Response Display */
             <div className="animate-fade-in-up">
-              <div className="bg-gradient-to-br from-primary-50 to-accent-50 border-2 border-primary-200 rounded-3xl p-8 md:p-10 shadow-xl">
-                {/* Success Header */}
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center">
-                    <svg className="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-gray-900">Analysis Complete! 🎯</h3>
-                    <p className="text-sm text-gray-600">Here's what I found</p>
-                  </div>
-                </div>
+              {!showCalendar ? (
+                // Analysis view - No card on mobile, card on desktop
+                <div className="sm:bg-gradient-to-br sm:from-primary-50 sm:to-accent-50 sm:border-2 sm:border-primary-200 sm:rounded-3xl sm:shadow-xl p-4 sm:p-8 md:p-10">
+                  {/* Success Header */}
+                  <div className="flex items-center gap-3 mb-6">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-green-500 flex items-center justify-center">
+                        <svg className="w-6 h-6 sm:w-7 sm:h-7 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className="text-xl sm:text-2xl font-bold text-gray-900">Analysis Complete! 🎯</h3>
+                        <p className="text-sm text-gray-600">Here's what I found</p>
+                      </div>
+                    </div>
 
                 {/* AI Analysis Results */}
                 <div className="space-y-6">
@@ -618,27 +723,20 @@ export default function ContactForm() {
                     </div>
                   </div>
 
-                  {/* CTA Buttons */}
-                  <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                    <Button
-                      variant="primary"
-                      size="md"
-                      className="flex-1"
-                      onClick={() => window.open('https://calendly.com/devmellio', '_blank')}
-                    >
-                      Book Strategy Call
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                    </Button>
-                    <Button
-                      variant="secondary"
-                      size="md"
-                      onClick={() => setAiResponse(null)}
-                    >
-                      Submit Another Request
-                    </Button>
-                  </div>
+                    {/* CTA Button */}
+                    <div className="pt-4">
+                      <Button
+                        variant="primary"
+                        size="md"
+                        className="w-full"
+                        onClick={() => setShowCalendar(true)}
+                      >
+                        Book Strategy Call
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      </Button>
+                    </div>
 
                   {/* Footer Note */}
                   <p className="text-sm text-gray-600 text-center pt-4 border-t border-gray-200">
@@ -646,6 +744,120 @@ export default function ContactForm() {
                   </p>
                 </div>
               </div>
+              ) : meetingScheduled ? (
+                /* Meeting Scheduled Success View */
+                <div className="sm:bg-gradient-to-br sm:from-green-50 sm:to-primary-50 sm:border-2 sm:border-green-200 sm:rounded-3xl sm:shadow-xl p-4 sm:p-8 md:p-10 text-center relative z-[999999] bg-white"
+                  style={{ position: 'relative', zIndex: 999999, backgroundColor: 'white' }}>
+                  <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">You're All Set! 🎉</h3>
+                  <p className="text-lg text-gray-700 mb-6">
+                    Your strategy call has been scheduled. Check your email for the calendar invitation and meeting details.
+                  </p>
+                  <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 mb-6">
+                    <h4 className="text-lg font-bold text-gray-900 mb-3">What to Expect</h4>
+                    <div className="space-y-3 text-left text-gray-700">
+                      <div className="flex items-start gap-3">
+                        <span className="text-primary-500 mt-1">•</span>
+                        <div>You'll receive a calendar invitation with meeting link</div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <span className="text-primary-500 mt-1">•</span>
+                        <div>We'll discuss your automation needs and the AI analysis</div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <span className="text-primary-500 mt-1">•</span>
+                        <div>I'll answer your questions and outline next steps</div>
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-6">
+                    Looking forward to talking with you! 👋
+                  </p>
+
+                  {/* Action Button */}
+                  <Button
+                    variant="primary"
+                    size="md"
+                    className="w-full sm:w-auto mx-auto"
+                    onClick={() => {
+                      // Reset everything to start fresh
+                      setAiResponse(null)
+                      setShowCalendar(false)
+                      setMeetingScheduled(false)
+                      setScheduledEventData(null)
+                    }}
+                  >
+                    Done
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </Button>
+                </div>
+              ) : !meetingScheduled ? (
+                /* Calendar view - No card on mobile, card on desktop */
+                <div className="sm:bg-gradient-to-br sm:from-primary-50 sm:to-accent-50 sm:border-2 sm:border-primary-200 sm:rounded-3xl sm:shadow-xl sm:p-6 -mx-4 sm:mx-0 relative">
+                  {/* Calendly Embed - Loads in background behind skeleton */}
+                  <div
+                    className="calendly-inline-widget w-full h-[calc(100vh-120px)] sm:h-[700px] sm:rounded-lg overflow-hidden"
+                    data-url="https://calendly.com/kllmmc23/30min"
+                  ></div>
+
+                  {/* Loading Skeleton - Sits on top of Calendly, fades out when loaded */}
+                  <div className={`absolute inset-0 bg-white sm:rounded-lg transition-opacity duration-500 ${calendlyLoaded ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+                    <div className="w-full h-full overflow-hidden">
+                      <div className="p-4 sm:p-8 space-y-6 animate-pulse">
+                        {/* Header - Name and meeting title */}
+                        <div className="text-center space-y-3">
+                          <div className="h-5 bg-gray-200 rounded w-32 mx-auto"></div>
+                          <div className="h-8 bg-gray-300 rounded w-56 mx-auto"></div>
+                          <div className="flex items-center justify-center gap-4 mt-4">
+                            <div className="flex items-center gap-2">
+                              <div className="h-5 w-5 bg-gray-200 rounded-full"></div>
+                              <div className="h-4 bg-gray-200 rounded w-16"></div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="h-5 w-5 bg-gray-200 rounded-full"></div>
+                              <div className="h-4 bg-gray-200 rounded w-48"></div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Divider */}
+                        <div className="h-px bg-gray-200"></div>
+
+                        {/* Calendar title */}
+                        <div className="h-6 bg-gray-200 rounded w-48 mx-auto"></div>
+
+                        {/* Month navigation */}
+                        <div className="flex items-center justify-between px-4">
+                          <div className="h-8 w-8 bg-gray-200 rounded"></div>
+                          <div className="h-6 bg-gray-300 rounded w-32"></div>
+                          <div className="h-8 w-8 bg-gray-200 rounded"></div>
+                        </div>
+
+                        {/* Calendar grid */}
+                        <div className="grid grid-cols-7 gap-2">
+                          {/* Day headers */}
+                          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => (
+                            <div key={`header-${i}`} className="h-8 flex items-center justify-center">
+                              <div className="h-4 w-4 bg-gray-200 rounded"></div>
+                            </div>
+                          ))}
+                          {/* Calendar days */}
+                          {[...Array(35)].map((_, i) => (
+                            <div key={i} className="h-10 bg-gray-100 rounded hover:bg-gray-200 transition-colors"></div>
+                          ))}
+                        </div>
+
+                        {/* Timezone */}
+                        <div className="flex items-center justify-center gap-2 mt-6">
+                          <div className="h-5 w-5 bg-gray-200 rounded-full"></div>
+                          <div className="h-4 bg-gray-200 rounded w-40"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
             </div>
           )}
         </div>

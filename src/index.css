@@ -132,4 +132,71 @@
     font-family: var(--font-sans);
     line-height: var(--line-height-normal);
   }
+
+  /* Hide ALL Calendly branding elements */
+  .calendly-badge-widget,
+  .calendly-badge-content,
+  .calendly-overlay,
+  .calendly-popup-content,
+  .calendly-close-overlay,
+  .calendly-spinner,
+  div.calendly-spinner,
+  [class*="calendly-badge"],
+  [class*="calendly-ribbon"],
+  [class*="calendly-branding"],
+  [class*="calendly-popup"],
+  [class*="calendly-spinner"],
+  div[style*="calendly"],
+  iframe[src*="calendly"] + div,
+  iframe[src*="calendly"] ~ div {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    position: absolute !important;
+    left: -9999px !important;
+    z-index: -9999 !important;
+  }
+
+  /* Aggressively hide any Calendly divs that appear on page */
+  body > div:not(#root):not([class]):not([id]) {
+    display: none !important;
+  }
+
+  /* Nuclear option for calendly-spinner specifically */
+  body div.calendly-spinner,
+  body > .calendly-spinner,
+  #root ~ .calendly-spinner,
+  body > div[class*="calendly"],
+  body > div[style*="position"],
+  div[class*="spinner"],
+  div[style*="spinner"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    z-index: -999999 !important;
+    position: fixed !important;
+    top: -10000px !important;
+    left: -10000px !important;
+    transform: translate(-10000px, -10000px) !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    pointer-events: none !important;
+  }
+
+  /* Ensure #root content stays on top */
+  #root {
+    position: relative;
+    z-index: 100000;
+  }
+
+  /* Hide Calendly elements inside iframe (if accessible) */
+  .calendly-inline-widget iframe {
+    position: relative;
+    z-index: 1;
+  }
 }
