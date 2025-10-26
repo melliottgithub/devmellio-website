@@ -18,7 +18,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="bg-white">
       <Hero onBookCall={handleBookCall} calendlyLoaded={calendlyLoaded} />
 
       {/* Contact Form with AI Analysis */}
