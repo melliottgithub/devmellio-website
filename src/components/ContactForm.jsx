@@ -22,7 +22,7 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
   const setCalLoaded = setCalendlyLoadedProp || (() => {})
   const [_skeletonFading, _setSkeletonFading] = useState(false)
   const [meetingScheduled, setMeetingScheduled] = useState(false)
-  const [_scheduledEventData, setScheduledEventData] = useState(null)
+  const [scheduledEventData, setScheduledEventData] = useState(null)
   const [calInitialized, setCalInitialized] = useState(false)
   const [showForm, setShowForm] = useState(false)
 
@@ -780,7 +780,17 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
                   variant="primary"
                   size="md"
                   onClick={() => {
+                    // Pre-fill form with data from Cal.com booking
+                    if (scheduledEventData?.data?.responses) {
+                      const responses = scheduledEventData.data.responses
+                      setFormData(prev => ({
+                        ...prev,
+                        name: responses.name?.value || '',
+                        email: responses.email?.value || ''
+                      }))
+                    }
                     // Show form to get AI analysis
+                    setShowForm(true)
                     setShowCalendar(false)
                     setMeetingScheduled(false)
                   }}
