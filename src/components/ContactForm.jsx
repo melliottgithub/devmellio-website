@@ -391,7 +391,7 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
   }
 
   return (
-    <Section id="contact" background="white" spacing="sm" className="border-t-4 border-red-500">
+    <Section id="contact" background="gradient" spacing="sm">
       <Container>
         <div className="max-w-4xl mx-auto">
           {/* Heading */}
@@ -451,10 +451,11 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
           {/* Calendly Widget - ALWAYS in DOM, loads in background */}
           <div
             id="calendly-widget"
-            className="-mx-4 sm:mx-0 relative bg-blue-200"
+            className="-mx-4 sm:mx-0 relative"
             style={{
               height: showCalendar || meetingScheduled ? 'auto' : '0',
-              overflow: 'visible'
+              overflow: 'visible',
+              display: showCalendar || meetingScheduled ? 'block' : 'none'
             }}
           >
             {/* Calendly Embed - Full size always, only opacity changes */}
