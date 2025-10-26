@@ -390,7 +390,7 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
   }
 
   return (
-    <Section id="contact" background="gradient" spacing="lg">
+    <Section id="contact" background="gradient" spacing="sm">
       <Container>
         <div className="max-w-4xl mx-auto">
           {/* Heading */}
