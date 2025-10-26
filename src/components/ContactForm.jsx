@@ -128,6 +128,25 @@ export default function ContactForm() {
     }
   }, [showCalendar])
 
+  // Common email typos
+  const emailTypos = {
+    'gmail.con': 'gmail.com',
+    'gmail.co': 'gmail.com',
+    'gmial.com': 'gmail.com',
+    'gmai.com': 'gmail.com',
+    'gmaill.com': 'gmail.com',
+    'yahooo.com': 'yahoo.com',
+    'yaho.com': 'yahoo.com',
+    'yahoo.con': 'yahoo.com',
+    'hotmail.con': 'hotmail.com',
+    'hotmail.co': 'hotmail.com',
+    'hotmial.com': 'hotmail.com',
+    'outlook.con': 'outlook.com',
+    'outlok.com': 'outlook.com',
+    'icloud.con': 'icloud.com',
+    'icoud.com': 'icloud.com',
+  }
+
   // Validation functions
   const validate = {
     name: (value) => {
@@ -142,6 +161,14 @@ export default function ContactForm() {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
       if (!emailRegex.test(value)) return "Please enter a valid email address"
       if (value.length > 254) return "Email is too long"
+
+      // Check for common typos
+      const domain = value.split('@')[1]?.toLowerCase()
+      if (domain && emailTypos[domain]) {
+        const suggested = value.split('@')[0] + '@' + emailTypos[domain]
+        return `Did you mean "${suggested}"?`
+      }
+
       return null
     },
 
