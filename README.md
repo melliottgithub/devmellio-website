@@ -8,8 +8,8 @@ Modern, elegant landing page for automation services built with 2026 design tren
 
 - **Framework:** Vite + React 18
 - **Styling:** Tailwind CSS v3
-- **Deployment:** Vercel
-- **CI/CD:** GitHub Actions
+- **Deployment:** AWS S3 + CloudFront
+- **CI/CD:** Manual deployment
 
 ## 🎨 Design System
 
@@ -41,7 +41,15 @@ npm run preview
 
 ## 🚀 Deployment
 
-Automatic deployment via Vercel on push to \`main\` branch.
+\`\`\`bash
+# Build production bundle
+npm run build
+
+# Deploy to S3
+aws s3 sync dist/ s3://devmellio-site/ --delete
+\`\`\`
+
+CloudFront CDN automatically serves the updated files.
 
 ---
 
