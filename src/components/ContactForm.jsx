@@ -585,21 +585,21 @@ export default function ContactForm() {
 
                 {/* Trust Indicators */}
                 <div className="mt-6 pt-6 border-t border-gray-200">
-                  <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-600">
+                  <div className="flex flex-col sm:flex-row sm:flex-wrap items-start sm:items-center justify-center gap-3 sm:gap-6 text-sm text-gray-600">
                     <div className="flex items-center gap-2">
-                      <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>
                       <span>No commitment required</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>
                       <span>No sales pitch</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>
                       <span>Response within 24 hours</span>
@@ -628,10 +628,10 @@ export default function ContactForm() {
                     </div>
 
                 {/* AI Analysis Results */}
-                <div className="space-y-6">
+                <div className="space-y-4">
                   {/* Personalized Message */}
                   {aiResponse.analysis?.personalized_message && (
-                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-primary-200">
+                    <div className="pb-4 border-b border-gray-200 sm:bg-white/80 sm:backdrop-blur-sm sm:rounded-2xl sm:p-6 sm:border sm:border-primary-200">
                       <p className="text-lg text-gray-800 leading-relaxed">
                         {aiResponse.analysis.personalized_message}
                       </p>
@@ -640,7 +640,7 @@ export default function ContactForm() {
 
                   {/* Estimated Impact */}
                   {aiResponse.analysis && (
-                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-200">
+                    <div className="pb-4 border-b border-gray-200 sm:bg-white/80 sm:backdrop-blur-sm sm:rounded-2xl sm:p-6 sm:border sm:border-gray-200">
                       <h4 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                         <span className="text-2xl">📊</span>
                         Estimated Impact
@@ -668,7 +668,7 @@ export default function ContactForm() {
 
                   {/* Recommended Solution */}
                   {aiResponse.analysis && (
-                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-200">
+                    <div className="pb-4 border-b border-gray-200 sm:bg-white/80 sm:backdrop-blur-sm sm:rounded-2xl sm:p-6 sm:border sm:border-gray-200">
                       <h4 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
                         <span className="text-2xl">🛠️</span>
                         Recommended Solution
@@ -711,7 +711,7 @@ export default function ContactForm() {
                   )}
 
                   {/* Next Steps */}
-                  <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-200">
+                  <div className="pb-4 border-b border-gray-200 sm:bg-white/80 sm:backdrop-blur-sm sm:rounded-2xl sm:p-6 sm:border sm:border-gray-200">
                     <h4 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
                       <span className="text-2xl">📋</span>
                       What Happens Next
