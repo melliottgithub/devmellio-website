@@ -408,8 +408,8 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
                   onClick={() => {
                     setShowCalendar(true)
                     setTimeout(() => {
-                      document.getElementById('cal-widget')?.scrollIntoView({ behavior: 'smooth' })
-                    }, 100)
+                      document.getElementById('cal-widget')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                    }, 300)
                   }}
                 >
                   {/* Green indicator when Cal.com is ready */}
