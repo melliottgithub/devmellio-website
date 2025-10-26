@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Button, Container, Section } from './ui'
 
-export default function ContactForm({ showCalendar: showCalendarProp, setShowCalendar: setShowCalendarProp }) {
+export default function ContactForm({ showCalendar: showCalendarProp, setShowCalendar: setShowCalendarProp, calendlyLoaded: calendlyLoadedProp, setCalendlyLoaded: setCalendlyLoadedProp }) {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -18,8 +18,8 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
   const [retryCount, setRetryCount] = useState(0)
   const showCalendar = showCalendarProp || false
   const setShowCalendar = setShowCalendarProp || (() => {})
-
-  const [calendlyLoaded, setCalendlyLoaded] = useState(false)
+  const calendlyLoaded = calendlyLoadedProp || false
+  const setCalendlyLoaded = setCalendlyLoadedProp || (() => {})
   const [skeletonFading, setSkeletonFading] = useState(false)
   const [meetingScheduled, setMeetingScheduled] = useState(false)
   const [_scheduledEventData, setScheduledEventData] = useState(null)
@@ -408,7 +408,7 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
                 <Button
                   variant="primary"
                   size="lg"
-                  className="w-full sm:w-auto"
+                  className="w-full sm:w-auto relative"
                   onClick={() => {
                     setShowCalendar(true)
                     setTimeout(() => {
@@ -416,6 +416,13 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
                     }, 100)
                   }}
                 >
+                  {/* Green indicator when Calendly is ready */}
+                  {calendlyLoaded && (
+                    <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                    </span>
+                  )}
                   Book Strategy Call
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />

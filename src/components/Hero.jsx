@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import WorkflowDiagram from './WorkflowDiagram'
 import { Button, Container, Section } from './ui'
 
-export default function Hero({ onBookCall }) {
+export default function Hero({ onBookCall, calendlyLoaded }) {
   const [stats, setStats] = useState(null)
   const [currentStatIndex, setCurrentStatIndex] = useState(0)
 
@@ -93,7 +93,15 @@ export default function Hero({ onBookCall }) {
                 size="md"
                 icon={<ArrowIcon />}
                 onClick={onBookCall}
+                className="relative"
               >
+                {/* Green indicator when Calendly is ready */}
+                {calendlyLoaded && (
+                  <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                  </span>
+                )}
                 Book a Strategy Call
               </Button>
             </div>

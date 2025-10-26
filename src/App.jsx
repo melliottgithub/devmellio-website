@@ -4,6 +4,7 @@ import ContactForm from './components/ContactForm'
 
 function App() {
   const [showCalendar, setShowCalendar] = useState(false)
+  const [calendlyLoaded, setCalendlyLoaded] = useState(false)
 
   const handleBookCall = () => {
     setShowCalendar(true)
@@ -18,10 +19,15 @@ function App() {
 
   return (
     <div className="min-h-screen bg-white">
-      <Hero onBookCall={handleBookCall} />
+      <Hero onBookCall={handleBookCall} calendlyLoaded={calendlyLoaded} />
 
       {/* Contact Form with AI Analysis */}
-      <ContactForm showCalendar={showCalendar} setShowCalendar={setShowCalendar} />
+      <ContactForm
+        showCalendar={showCalendar}
+        setShowCalendar={setShowCalendar}
+        calendlyLoaded={calendlyLoaded}
+        setCalendlyLoaded={setCalendlyLoaded}
+      />
     </div>
   )
 }
