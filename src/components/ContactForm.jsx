@@ -18,38 +18,38 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
   const [retryCount, setRetryCount] = useState(0)
   const showCalendar = showCalendarProp || false
   const setShowCalendar = setShowCalendarProp || (() => {})
-  const calendlyLoaded = calendlyLoadedProp || false
-  const setCalendlyLoaded = setCalendlyLoadedProp || (() => {})
+  const calLoaded = calendlyLoadedProp || false
+  const setCalLoaded = setCalendlyLoadedProp || (() => {})
   const [_skeletonFading, _setSkeletonFading] = useState(false)
   const [meetingScheduled, setMeetingScheduled] = useState(false)
   const [_scheduledEventData, setScheduledEventData] = useState(null)
-  const [calendlyInitialized, setCalendlyInitialized] = useState(false)
+  const [calInitialized, setCalInitialized] = useState(false)
   const [showForm, setShowForm] = useState(false)
 
-  // Initialize Calendly widget immediately on mount (hidden)
+  // Initialize Cal.com widget immediately on mount (hidden)
   useEffect(() => {
     // Try immediately first
-    if (window.Calendly && !calendlyInitialized) {
-      setCalendlyInitialized(true)
+    if (window.Cal && !calInitialized) {
+      setCalInitialized(true)
       return
     }
 
-    // If not ready, poll for Calendly to be available
-    const checkCalendly = () => {
-      if (window.Calendly && !calendlyInitialized) {
-        setCalendlyInitialized(true)
+    // If not ready, poll for Cal.com to be available
+    const checkCal = () => {
+      if (window.Cal && !calInitialized) {
+        setCalInitialized(true)
       }
     }
 
     // Check every 100ms for up to 5 seconds
-    const interval = setInterval(checkCalendly, 100)
+    const interval = setInterval(checkCal, 100)
     const timeout = setTimeout(() => clearInterval(interval), 5000)
 
     return () => {
       clearInterval(interval)
       clearTimeout(timeout)
     }
-  }, [calendlyInitialized])
+  }, [calInitialized])
 
   // Mark as animated after first render
   useEffect(() => {
@@ -58,21 +58,21 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
     }
   }, [aiResponse, hasAnimated])
 
-  // DESTROY ALL CALENDLY when meeting is scheduled
+  // DESTROY ALL CAL.COM when meeting is scheduled
   useEffect(() => {
     if (meetingScheduled) {
-      const nukeAllCalendly = () => {
+      const nukeAllCal = () => {
         const allElements = document.querySelectorAll('*')
         allElements.forEach(el => {
           const className = el.className
-          if (className && typeof className === 'string' && className.includes('calendly')) {
+          if (className && typeof className === 'string' && className.includes('cal-')) {
             el.remove()
           }
         })
       }
 
-      nukeAllCalendly()
-      const nukingInterval = setInterval(nukeAllCalendly, 100)
+      nukeAllCal()
+      const nukingInterval = setInterval(nukeAllCal, 100)
 
       const observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
@@ -80,7 +80,7 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
             if (node.nodeType === 1) {
               const element = node
               if (element.className && typeof element.className === 'string' &&
-                  element.className.includes('calendly')) {
+                  element.className.includes('cal-')) {
                 element.remove()
               }
             }
@@ -100,68 +100,62 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
     }
   }, [meetingScheduled])
 
-  // Initialize Calendly inline widget when ready (loads in background)
+  // Initialize Cal.com inline widget when ready (loads in background)
   useEffect(() => {
-    if (calendlyInitialized && window.Calendly && setCalendlyLoaded) {
-      setCalendlyLoaded(false)
+    if (calInitialized && window.Cal && setCalLoaded) {
+      setCalLoaded(false)
 
-      // Listen for Calendly events
-      const handleCalendlyMessage = (e) => {
-        if (e.data.event && e.data.event.indexOf('calendly') === 0) {
-          // Hide skeleton on event_type_viewed (page fully loaded)
-          if (e.data.event === 'calendly.event_type_viewed') {
-            // Calendly is ready, remove skeleton immediately
-            setCalendlyLoaded(true)
-          }
+      // Initialize Cal.com
+      const Cal = window.Cal
 
-          // Capture when meeting is scheduled
-          if (e.data.event === 'calendly.event_scheduled') {
-            setMeetingScheduled(true)
-            setScheduledEventData(e.data.payload)
+      // Listen for booking successful event
+      Cal("on", {
+        action: "bookingSuccessful",
+        callback: (e) => {
+          setMeetingScheduled(true)
+          setScheduledEventData(e.detail)
 
-            // Track conversion event in Google Analytics (if available)
-            if (window.gtag) {
-              window.gtag('event', 'meeting_scheduled', {
-                event_category: 'conversion',
-                event_label: 'strategy_call',
-                value: 1
-              })
-            }
-
-            // Send booking data to backend
-            fetch('https://w3o3gzmmwa.execute-api.us-east-1.amazonaws.com/prod/booking', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                calendly_event: e.data.payload,
-                lead_id: aiResponse?.lead_id
-              })
+          // Track conversion event in Google Analytics (if available)
+          if (window.gtag) {
+            window.gtag('event', 'meeting_scheduled', {
+              event_category: 'conversion',
+              event_label: 'strategy_call',
+              value: 1
             })
-              .then(r => r.json())
-              .catch(err => console.error('Failed to save booking:', err))
           }
+
+          // Send booking data to backend
+          fetch('https://w3o3gzmmwa.execute-api.us-east-1.amazonaws.com/prod/booking', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              cal_event: e.detail,
+              lead_id: aiResponse?.lead_id
+            })
+          })
+            .then(r => r.json())
+            .catch(err => console.error('Failed to save booking:', err))
         }
-      }
+      })
 
-      window.addEventListener('message', handleCalendlyMessage)
+      // Initialize Cal.com inline widget
+      Cal("inline", {
+        elementOrSelector: "#cal-booking-widget",
+        calLink: "mellio/30min",
+        config: {
+          name: "",
+          email: "",
+          notes: "",
+          theme: "light"
+        }
+      })
 
-      // Initialize Calendly widget when shown
-      const widgetElement = document.querySelector('.calendly-inline-widget')
-
-      if (widgetElement) {
-        window.Calendly.initInlineWidget({
-          url: 'https://calendly.com/kllmmc23/30min?hide_gdpr_banner=1',
-          parentElement: widgetElement,
-          prefill: {},
-          utm: {}
-        })
-      }
-
-      return () => {
-        window.removeEventListener('message', handleCalendlyMessage)
-      }
+      // Mark as loaded after initialization
+      setTimeout(() => {
+        setCalLoaded(true)
+      }, 1000)
     }
-  }, [calendlyInitialized, aiResponse?.lead_id, setCalendlyLoaded]) // Run when Calendly script is ready
+  }, [calInitialized, aiResponse?.lead_id, setCalLoaded]) // Run when Cal.com script is ready
 
   // Common email typos
   const emailTypos = {
@@ -413,12 +407,12 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
                   onClick={() => {
                     setShowCalendar(true)
                     setTimeout(() => {
-                      document.getElementById('calendly-widget')?.scrollIntoView({ behavior: 'smooth' })
+                      document.getElementById('cal-widget')?.scrollIntoView({ behavior: 'smooth' })
                     }, 100)
                   }}
                 >
-                  {/* Green indicator when Calendly is ready */}
-                  {calendlyLoaded && (
+                  {/* Green indicator when Cal.com is ready */}
+                  {calLoaded && (
                     <span className="flex h-2 w-2 mr-2">
                       <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-green-400 opacity-75"></span>
                       <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
@@ -448,32 +442,32 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
             )}
           </div>
 
-          {/* Calendly Widget - ALWAYS in DOM, loads in background */}
+          {/* Cal.com Widget - ALWAYS in DOM, loads in background */}
           <div
-            id="calendly-widget"
+            id="cal-widget"
             className="-mx-4 sm:mx-0 relative"
             style={{
               height: showCalendar || meetingScheduled ? 'auto' : '0',
               overflow: 'visible'
             }}
           >
-            {/* Calendly Embed - Full size always, only opacity changes */}
+            {/* Cal.com Embed - Full size always, only opacity changes */}
             <div
               style={{
-                opacity: showCalendar && !meetingScheduled && calendlyLoaded ? '1' : '0',
-                pointerEvents: showCalendar && !meetingScheduled && calendlyLoaded ? 'auto' : 'none',
+                opacity: showCalendar && !meetingScheduled && calLoaded ? '1' : '0',
+                pointerEvents: showCalendar && !meetingScheduled && calLoaded ? 'auto' : 'none',
                 minHeight: showCalendar || meetingScheduled ? 'calc(100vh - 120px)' : '0'
               }}
               className={showCalendar || meetingScheduled ? 'sm:min-h-[900px]' : ''}
             >
               <div
-                className="calendly-inline-widget w-full h-[calc(100vh-120px)] sm:h-[900px] overflow-hidden"
-                data-url="https://calendly.com/kllmmc23/30min"
+                id="cal-booking-widget"
+                className="w-full h-[calc(100vh-120px)] sm:h-[900px] overflow-hidden"
               ></div>
             </div>
 
             {/* Loading Skeleton - Shows when clicked but not loaded yet */}
-            {showCalendar && !calendlyLoaded && !meetingScheduled && (
+            {showCalendar && !calLoaded && !meetingScheduled && (
               <div className="absolute inset-0 w-full h-[calc(100vh-120px)] sm:h-[900px] bg-white z-10">
                   <div className="w-full h-full overflow-hidden">
                     <div className="p-4 sm:p-8 space-y-6 animate-pulse">
