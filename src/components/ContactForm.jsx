@@ -781,12 +781,12 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
                   size="md"
                   onClick={() => {
                     // Pre-fill form with data from Cal.com booking
-                    if (scheduledEventData) {
-                      // Try multiple possible data structures
-                      const data = scheduledEventData.data || scheduledEventData
-                      const responses = data.responses || {}
-                      const name = responses.name?.value || data.name || ''
-                      const email = responses.email?.value || data.email || ''
+                    if (scheduledEventData?.data) {
+                      const attendee = scheduledEventData.data.attendee || {}
+                      const responses = scheduledEventData.data.responses || {}
+
+                      const name = attendee.name || responses.name || ''
+                      const email = attendee.email || responses.email || ''
 
                       setFormData(prev => ({
                         ...prev,
