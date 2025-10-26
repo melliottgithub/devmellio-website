@@ -69,7 +69,6 @@ export default function Hero({ onBookCall, calendlyLoaded }) {
           <div className="text-center lg:text-left space-y-6 md:space-y-8 animate-fade-in-up">
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm border border-primary-200 rounded-full text-sm font-medium text-primary-700">
-              <span className="w-2 h-2 bg-accent-500 rounded-full animate-pulse"></span>
               AI-Powered Automation
             </div>
 
