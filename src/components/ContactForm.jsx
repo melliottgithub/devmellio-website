@@ -410,7 +410,12 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
                   variant="primary"
                   size="lg"
                   className="w-full sm:w-auto"
-                  onClick={() => setShowCalendar(true)}
+                  onClick={() => {
+                    setShowCalendar(true)
+                    setTimeout(() => {
+                      document.getElementById('calendly-widget')?.scrollIntoView({ behavior: 'smooth' })
+                    }, 100)
+                  }}
                 >
                   Book Strategy Call
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -432,7 +437,14 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
           </div>
 
           {/* Calendly Widget - ALWAYS in DOM, loads in background */}
-          <div className="-mx-4 sm:mx-0 relative">
+          <div
+            id="calendly-widget"
+            className="-mx-4 sm:mx-0 relative"
+            style={{
+              height: showCalendar || meetingScheduled ? 'auto' : '1px',
+              overflow: 'visible'
+            }}
+          >
             {/* Calendly Embed - Use ONLY opacity to hide/show */}
             <div
               style={{

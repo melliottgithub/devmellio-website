@@ -7,11 +7,11 @@ function App() {
 
   const handleBookCall = () => {
     setShowCalendar(true)
-    // Scroll to contact section
+    // Scroll to calendly widget
     setTimeout(() => {
-      const contactSection = document.getElementById('contact')
-      if (contactSection) {
-        contactSection.scrollIntoView({ behavior: 'smooth' })
+      const calendlySection = document.getElementById('calendly-widget')
+      if (calendlySection) {
+        calendlySection.scrollIntoView({ behavior: 'smooth' })
       }
     }, 100)
   }
