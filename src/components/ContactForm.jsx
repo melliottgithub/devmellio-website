@@ -388,17 +388,18 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
     <Section id="contact" background="gradient" spacing="sm">
       <Container>
         <div className="max-w-4xl mx-auto">
-          {/* Heading */}
-          <div className="text-center mb-12 animate-fade-in-up">
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
-              Ready to Stop Wasting Time on Manual Work?
-            </h2>
-            <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto mb-8">
-              Let's discuss how automation can save you 20+ hours per week and boost your ROI.
-            </p>
+          {/* Heading - Only show when calendar is hidden */}
+          {!showCalendar && (
+            <div className="text-center mb-12 animate-fade-in-up">
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
+                Ready to Stop Wasting Time on Manual Work?
+              </h2>
+              <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto mb-8">
+                Let's discuss how automation can save you 20+ hours per week and boost your ROI.
+              </p>
 
-            {/* Primary CTA: Book Strategy Call */}
-            {!showCalendar && !aiResponse && (
+              {/* Primary CTA: Book Strategy Call */}
+              {!aiResponse && (
               <div className="flex flex-col items-center gap-4">
                 <Button
                   variant="primary"
@@ -439,8 +440,9 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
                   </button>
                 </p>
               </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
 
           {/* Cal.com Widget - ALWAYS in DOM, loads in background */}
           <div
