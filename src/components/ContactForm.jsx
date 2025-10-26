@@ -24,6 +24,7 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
   const [meetingScheduled, setMeetingScheduled] = useState(false)
   const [_scheduledEventData, setScheduledEventData] = useState(null)
   const [calendlyInitialized, setCalendlyInitialized] = useState(false)
+  const [showForm, setShowForm] = useState(false)
 
   // Initialize Calendly widget immediately on mount (hidden)
   useEffect(() => {
@@ -432,7 +433,12 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
                   Want a free AI analysis first?{' '}
                   <button
                     type="button"
-                    onClick={() => document.getElementById('contact-form')?.scrollIntoView({ behavior: 'smooth' })}
+                    onClick={() => {
+                      setShowForm(true)
+                      setTimeout(() => {
+                        document.getElementById('contact-form')?.scrollIntoView({ behavior: 'smooth' })
+                      }, 100)
+                    }}
                     className="text-primary-600 hover:text-primary-700 font-medium underline"
                   >
                     Get your automation audit
@@ -525,9 +531,8 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
               )}
           </div>
 
-          {/* Form - Temporarily hidden */}
-          {/* eslint-disable-next-line no-constant-condition */}
-          {!aiResponse && !showCalendar && !meetingScheduled && false ? (
+          {/* Form - Show when user clicks "Get your automation audit" */}
+          {!aiResponse && !showCalendar && !meetingScheduled && showForm ? (
             <form id="contact-form" onSubmit={handleSubmit} className={`space-y-6 ${!hasAnimated ? 'animate-fade-in-up' : ''}`} style={!hasAnimated ? { animationDelay: '0.1s' } : {}}>
               {/* Card Container */}
               <div className={`sm:bg-white/80 sm:backdrop-blur-sm sm:border sm:border-gray-200 sm:rounded-3xl p-4 sm:p-8 md:p-10 sm:shadow-lg relative ${isSubmitting ? 'opacity-60 pointer-events-none' : ''}`}>
