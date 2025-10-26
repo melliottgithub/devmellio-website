@@ -5,29 +5,29 @@ import Footer from './components/Footer'
 
 function App() {
   const [showCalendar, setShowCalendar] = useState(false)
-  const [calendlyLoaded, setCalendlyLoaded] = useState(false)
+  const [calLoaded, setCalLoaded] = useState(false)
 
   const handleBookCall = () => {
     setShowCalendar(true)
-    // Scroll to calendly widget
+    // Scroll to Cal.com widget
     setTimeout(() => {
-      const calendlySection = document.getElementById('calendly-widget')
-      if (calendlySection) {
-        calendlySection.scrollIntoView({ behavior: 'smooth' })
+      const calSection = document.getElementById('cal-widget-container')
+      if (calSection) {
+        calSection.scrollIntoView({ behavior: 'smooth' })
       }
     }, 100)
   }
 
   return (
     <div className="bg-white">
-      <Hero onBookCall={handleBookCall} calendlyLoaded={calendlyLoaded} />
+      <Hero onBookCall={handleBookCall} calendlyLoaded={calLoaded} />
 
       {/* Contact Form with AI Analysis */}
       <ContactForm
         showCalendar={showCalendar}
         setShowCalendar={setShowCalendar}
-        calendlyLoaded={calendlyLoaded}
-        setCalendlyLoaded={setCalendlyLoaded}
+        calendlyLoaded={calLoaded}
+        setCalendlyLoaded={setCalLoaded}
       />
 
       {/* Footer */}
