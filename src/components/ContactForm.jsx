@@ -20,7 +20,7 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
   const setShowCalendar = setShowCalendarProp || (() => {})
   const calendlyLoaded = calendlyLoadedProp || false
   const setCalendlyLoaded = setCalendlyLoadedProp || (() => {})
-  const [skeletonFading, setSkeletonFading] = useState(false)
+  const [_skeletonFading, _setSkeletonFading] = useState(false)
   const [meetingScheduled, setMeetingScheduled] = useState(false)
   const [_scheduledEventData, setScheduledEventData] = useState(null)
   const [calendlyInitialized, setCalendlyInitialized] = useState(false)
@@ -101,7 +101,7 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
 
   // Initialize Calendly inline widget when ready (loads in background)
   useEffect(() => {
-    if (calendlyInitialized && window.Calendly) {
+    if (calendlyInitialized && window.Calendly && setCalendlyLoaded) {
       setCalendlyLoaded(false)
 
       // Listen for Calendly events
@@ -160,7 +160,7 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
         window.removeEventListener('message', handleCalendlyMessage)
       }
     }
-  }, [calendlyInitialized, aiResponse?.lead_id]) // Run when Calendly script is ready
+  }, [calendlyInitialized, aiResponse?.lead_id, setCalendlyLoaded]) // Run when Calendly script is ready
 
   // Common email typos
   const emailTypos = {
@@ -526,7 +526,8 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
           </div>
 
           {/* Form - Temporarily hidden */}
-          {false && !aiResponse && !showCalendar && !meetingScheduled ? (
+          {/* eslint-disable-next-line no-constant-condition */}
+          {!aiResponse && !showCalendar && !meetingScheduled && false ? (
             <form id="contact-form" onSubmit={handleSubmit} className={`space-y-6 ${!hasAnimated ? 'animate-fade-in-up' : ''}`} style={!hasAnimated ? { animationDelay: '0.1s' } : {}}>
               {/* Card Container */}
               <div className={`sm:bg-white/80 sm:backdrop-blur-sm sm:border sm:border-gray-200 sm:rounded-3xl p-4 sm:p-8 md:p-10 sm:shadow-lg relative ${isSubmitting ? 'opacity-60 pointer-events-none' : ''}`}>
@@ -783,7 +784,7 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
                 </div>
               </div>
             </form>
-          ) : (
+          ) : aiResponse ? (
             /* AI Response Display */
             <div className="animate-fade-in-up">
               {!showCalendar ? (
@@ -981,7 +982,7 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
                 </div>
               ) : null}
             </div>
-          )}
+          ) : null}
         </div>
       </Container>
     </Section>
