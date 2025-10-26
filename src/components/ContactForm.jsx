@@ -71,6 +71,7 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
       Cal("on", {
         action: "bookingSuccessful",
         callback: (e) => {
+          console.log('📅 Cal.com booking data:', e.detail)
           setMeetingScheduled(true)
           setScheduledEventData(e.detail)
 
@@ -780,13 +781,21 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
                   variant="primary"
                   size="md"
                   onClick={() => {
+                    console.log('📋 Attempting to pre-fill form with:', scheduledEventData)
                     // Pre-fill form with data from Cal.com booking
-                    if (scheduledEventData?.data?.responses) {
-                      const responses = scheduledEventData.data.responses
+                    if (scheduledEventData) {
+                      // Try multiple possible data structures
+                      const data = scheduledEventData.data || scheduledEventData
+                      const responses = data.responses || {}
+                      const name = responses.name?.value || data.name || ''
+                      const email = responses.email?.value || data.email || ''
+
+                      console.log('📋 Extracted name:', name, 'email:', email)
+
                       setFormData(prev => ({
                         ...prev,
-                        name: responses.name?.value || '',
-                        email: responses.email?.value || ''
+                        name: name,
+                        email: email
                       }))
                     }
                     // Show form to get AI analysis
