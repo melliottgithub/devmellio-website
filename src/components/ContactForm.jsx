@@ -462,9 +462,9 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
               style={{
                 opacity: showCalendar && !meetingScheduled && calendlyLoaded ? '1' : '0',
                 pointerEvents: showCalendar && !meetingScheduled && calendlyLoaded ? 'auto' : 'none',
-                minHeight: 'calc(100vh - 120px)'
+                minHeight: showCalendar || meetingScheduled ? 'calc(100vh - 120px)' : '0'
               }}
-              className="sm:min-h-[900px]"
+              className={showCalendar || meetingScheduled ? 'sm:min-h-[900px]' : ''}
             >
               <div
                 className="calendly-inline-widget w-full h-[calc(100vh-120px)] sm:h-[900px] overflow-hidden"
