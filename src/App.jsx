@@ -10,12 +10,12 @@ function App() {
   const handleBookCall = () => {
     setShowCalendar(true)
     // Scroll to Cal.com widget
-    setTimeout(() => {
-      const calSection = document.getElementById('cal-widget-container')
+    requestAnimationFrame(() => {
+      const calSection = document.getElementById('cal-widget')
       if (calSection) {
-        calSection.scrollIntoView({ behavior: 'smooth' })
+        calSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
       }
-    }, 100)
+    })
   }
 
   return (

@@ -407,9 +407,9 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
                   className="w-full sm:w-auto"
                   onClick={() => {
                     setShowCalendar(true)
-                    setTimeout(() => {
+                    requestAnimationFrame(() => {
                       document.getElementById('cal-widget')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                    }, 300)
+                    })
                   }}
                 >
                   {/* Green indicator when Cal.com is ready */}
