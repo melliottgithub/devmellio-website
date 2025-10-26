@@ -454,8 +454,7 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
             className="-mx-4 sm:mx-0 relative"
             style={{
               height: showCalendar || meetingScheduled ? 'auto' : '0',
-              overflow: 'visible',
-              display: showCalendar || meetingScheduled ? 'block' : 'none'
+              overflow: 'visible'
             }}
           >
             {/* Calendly Embed - Full size always, only opacity changes */}
@@ -533,7 +532,7 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
           </div>
 
           {/* Form - Show when user clicks "Get your automation audit" */}
-          <div style={{ height: showForm && !aiResponse && !showCalendar && !meetingScheduled ? 'auto' : '0', overflow: 'hidden' }}>
+          <div style={{ display: showForm && !aiResponse && !showCalendar && !meetingScheduled ? 'block' : 'none' }}>
           {!aiResponse && !showCalendar && !meetingScheduled && showForm ? (
             <form id="contact-form" onSubmit={handleSubmit} className={`space-y-6 ${!hasAnimated ? 'animate-fade-in-up' : ''}`} style={!hasAnimated ? { animationDelay: '0.1s' } : {}}>
               {/* Card Container */}
