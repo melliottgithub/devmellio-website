@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Hero from './components/Hero'
 import ContactForm from './components/ContactForm'
+import Footer from './components/Footer'
 
 function App() {
   const [showCalendar, setShowCalendar] = useState(false)
@@ -28,6 +29,9 @@ function App() {
         calendlyLoaded={calendlyLoaded}
         setCalendlyLoaded={setCalendlyLoaded}
       />
+
+      {/* Footer */}
+      <Footer />
     </div>
   )
 }
