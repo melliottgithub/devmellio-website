@@ -74,6 +74,11 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
           setMeetingScheduled(true)
           setScheduledEventData(e.detail)
 
+          // Scroll to top to show success message
+          requestAnimationFrame(() => {
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+          })
+
           // Track conversion event in Google Analytics (if available)
           if (window.gtag) {
             window.gtag('event', 'meeting_scheduled', {
