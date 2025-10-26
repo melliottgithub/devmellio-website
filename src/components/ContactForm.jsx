@@ -454,7 +454,7 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
             className="-mx-4 sm:mx-0 relative"
             style={{
               height: showCalendar || meetingScheduled ? 'auto' : '0',
-              overflow: showCalendar || meetingScheduled ? 'visible' : 'hidden'
+              overflow: 'visible'
             }}
           >
             {/* Calendly Embed - Full size always, only opacity changes */}
