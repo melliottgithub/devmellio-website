@@ -58,47 +58,6 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
     }
   }, [aiResponse, hasAnimated])
 
-  // DESTROY ALL CAL.COM when meeting is scheduled
-  useEffect(() => {
-    if (meetingScheduled) {
-      const nukeAllCal = () => {
-        const allElements = document.querySelectorAll('*')
-        allElements.forEach(el => {
-          const className = el.className
-          if (className && typeof className === 'string' && className.includes('cal-')) {
-            el.remove()
-          }
-        })
-      }
-
-      nukeAllCal()
-      const nukingInterval = setInterval(nukeAllCal, 100)
-
-      const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-          mutation.addedNodes.forEach((node) => {
-            if (node.nodeType === 1) {
-              const element = node
-              if (element.className && typeof element.className === 'string' &&
-                  element.className.includes('cal-')) {
-                element.remove()
-              }
-            }
-          })
-        })
-      })
-
-      observer.observe(document.body, {
-        childList: true,
-        subtree: true
-      })
-
-      return () => {
-        clearInterval(nukingInterval)
-        observer.disconnect()
-      }
-    }
-  }, [meetingScheduled])
 
   // Initialize Cal.com inline widget when ready (loads in background)
   useEffect(() => {
@@ -130,7 +89,7 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               cal_event: e.detail,
-              lead_id: aiResponse?.lead_id
+              lead_id: aiResponse?.lead_id || 'direct-booking'
             })
           })
             .then(r => r.json())
@@ -788,7 +747,67 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
             </form>
           ) : null}
           </div>
-          {aiResponse ? (
+          {meetingScheduled ? (
+            /* Meeting Scheduled Success View */
+            <div className="sm:bg-gradient-to-br sm:from-green-50 sm:to-primary-50 sm:border-2 sm:border-green-200 sm:rounded-3xl sm:shadow-xl p-4 sm:p-8 md:p-10 text-center relative z-[999999] bg-white"
+              style={{ position: 'relative', zIndex: 999999, backgroundColor: 'white' }}>
+              <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">You're All Set! 🎉</h3>
+              <p className="text-lg text-gray-700 mb-6">
+                Your strategy call has been scheduled. Check your email for the calendar invitation and meeting details.
+              </p>
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 mb-6">
+                <h4 className="text-lg font-bold text-gray-900 mb-3">What to Expect</h4>
+                <div className="space-y-3 text-left text-gray-700">
+                  <div className="flex items-start gap-3">
+                    <span className="text-primary-500 mt-1">•</span>
+                    <div>You'll receive a calendar invitation with meeting link</div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="text-primary-500 mt-1">•</span>
+                    <div>We'll discuss your automation needs{aiResponse ? ' and the AI analysis' : ''}</div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="text-primary-500 mt-1">•</span>
+                    <div>I'll answer your questions and outline next steps</div>
+                  </div>
+                </div>
+              </div>
+              <p className="text-sm text-gray-600 mb-6">
+                Looking forward to talking with you! 👋
+              </p>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button
+                  variant="primary"
+                  size="md"
+                  onClick={() => {
+                    // Show form to get AI analysis
+                    setShowCalendar(false)
+                    setMeetingScheduled(false)
+                  }}
+                >
+                  Get Free AI Analysis
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  </svg>
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="md"
+                  onClick={() => {
+                    // Reset everything
+                    setAiResponse(null)
+                    setShowCalendar(false)
+                    setMeetingScheduled(false)
+                    setScheduledEventData(null)
+                  }}
+                >
+                  Done
+                </Button>
+              </div>
+            </div>
+          ) : aiResponse ? (
             /* AI Response Display */
             <div className="animate-fade-in-up">
               {!showCalendar ? (
@@ -924,66 +943,6 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
                   </p>
                 </div>
               </div>
-              ) : meetingScheduled ? (
-                /* Meeting Scheduled Success View */
-                <div className="sm:bg-gradient-to-br sm:from-green-50 sm:to-primary-50 sm:border-2 sm:border-green-200 sm:rounded-3xl sm:shadow-xl p-4 sm:p-8 md:p-10 text-center relative z-[999999] bg-white"
-                  style={{ position: 'relative', zIndex: 999999, backgroundColor: 'white' }}>
-                  <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">You're All Set! 🎉</h3>
-                  <p className="text-lg text-gray-700 mb-6">
-                    Your strategy call has been scheduled. Check your email for the calendar invitation and meeting details.
-                  </p>
-                  <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 mb-6">
-                    <h4 className="text-lg font-bold text-gray-900 mb-3">What to Expect</h4>
-                    <div className="space-y-3 text-left text-gray-700">
-                      <div className="flex items-start gap-3">
-                        <span className="text-primary-500 mt-1">•</span>
-                        <div>You'll receive a calendar invitation with meeting link</div>
-                      </div>
-                      <div className="flex items-start gap-3">
-                        <span className="text-primary-500 mt-1">•</span>
-                        <div>We'll discuss your automation needs and the AI analysis</div>
-                      </div>
-                      <div className="flex items-start gap-3">
-                        <span className="text-primary-500 mt-1">•</span>
-                        <div>I'll answer your questions and outline next steps</div>
-                      </div>
-                    </div>
-                  </div>
-                  <p className="text-sm text-gray-600 mb-6">
-                    Looking forward to talking with you! 👋
-                  </p>
-
-                  {/* Action Buttons */}
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Button
-                      variant="primary"
-                      size="md"
-                      onClick={() => {
-                        // Show form to get AI analysis
-                        setShowCalendar(false)
-                        setMeetingScheduled(false)
-                      }}
-                    >
-                      Get Free AI Analysis
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                      </svg>
-                    </Button>
-                    <Button
-                      variant="secondary"
-                      size="md"
-                      onClick={() => {
-                        // Reset everything
-                        setAiResponse(null)
-                        setShowCalendar(false)
-                        setMeetingScheduled(false)
-                        setScheduledEventData(null)
-                      }}
-                    >
-                      Done
-                    </Button>
-                  </div>
-                </div>
               ) : null}
             </div>
           ) : null}
