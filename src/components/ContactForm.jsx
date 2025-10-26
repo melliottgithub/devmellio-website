@@ -18,6 +18,7 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
   const [retryCount, setRetryCount] = useState(0)
   const showCalendar = showCalendarProp || false
   const setShowCalendar = setShowCalendarProp || (() => {})
+
   const [calendlyLoaded, setCalendlyLoaded] = useState(false)
   const [skeletonFading, setSkeletonFading] = useState(false)
   const [meetingScheduled, setMeetingScheduled] = useState(false)
@@ -108,10 +109,8 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
         if (e.data.event && e.data.event.indexOf('calendly') === 0) {
           // Hide skeleton on event_type_viewed (page fully loaded)
           if (e.data.event === 'calendly.event_type_viewed') {
-            // Wait for Calendly iframe content to fully render, then instantly remove skeleton
-            setTimeout(() => {
-              setCalendlyLoaded(true)
-            }, 1500)
+            // Calendly is ready, remove skeleton immediately
+            setCalendlyLoaded(true)
           }
 
           // Capture when meeting is scheduled
@@ -441,16 +440,18 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
             id="calendly-widget"
             className="-mx-4 sm:mx-0 relative"
             style={{
-              height: showCalendar || meetingScheduled ? 'auto' : '1px',
+              height: showCalendar || meetingScheduled ? 'auto' : '0',
               overflow: 'visible'
             }}
           >
-            {/* Calendly Embed - Use ONLY opacity to hide/show */}
+            {/* Calendly Embed - Full size always, only opacity changes */}
             <div
               style={{
                 opacity: showCalendar && !meetingScheduled && calendlyLoaded ? '1' : '0',
-                pointerEvents: showCalendar && !meetingScheduled && calendlyLoaded ? 'auto' : 'none'
+                pointerEvents: showCalendar && !meetingScheduled && calendlyLoaded ? 'auto' : 'none',
+                minHeight: 'calc(100vh - 120px)'
               }}
+              className="sm:min-h-[900px]"
             >
               <div
                 className="calendly-inline-widget w-full h-[calc(100vh-120px)] sm:h-[900px] overflow-hidden"
