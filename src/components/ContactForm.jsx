@@ -406,7 +406,7 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
             id="cal-widget"
             className="-mx-4 sm:mx-0 relative"
             style={{
-              height: showCalendar || meetingScheduled ? 'auto' : '0',
+              height: showCalendar && !meetingScheduled ? 'auto' : '0',
               overflow: 'visible'
             }}
           >
@@ -415,9 +415,9 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
               style={{
                 opacity: showCalendar && !meetingScheduled && calLoaded ? '1' : '0',
                 pointerEvents: showCalendar && !meetingScheduled && calLoaded ? 'auto' : 'none',
-                minHeight: showCalendar || meetingScheduled ? 'calc(100vh - 120px)' : '0'
+                minHeight: showCalendar && !meetingScheduled ? 'calc(100vh - 120px)' : '0'
               }}
-              className={showCalendar || meetingScheduled ? 'sm:min-h-[900px]' : ''}
+              className={showCalendar && !meetingScheduled ? 'sm:min-h-[900px]' : ''}
             >
               <div
                 id="cal-booking-widget"
