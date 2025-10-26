@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Button, Container, Section } from './ui'
 
-export default function ContactForm() {
+export default function ContactForm({ showCalendar: showCalendarProp, setShowCalendar: setShowCalendarProp }) {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -16,10 +16,38 @@ export default function ContactForm() {
   const [hasAnimated, setHasAnimated] = useState(false)
   const [isSlowResponse, setIsSlowResponse] = useState(false)
   const [retryCount, setRetryCount] = useState(0)
-  const [showCalendar, setShowCalendar] = useState(false)
+  const showCalendar = showCalendarProp || false
+  const setShowCalendar = setShowCalendarProp || (() => {})
   const [calendlyLoaded, setCalendlyLoaded] = useState(false)
+  const [skeletonFading, setSkeletonFading] = useState(false)
   const [meetingScheduled, setMeetingScheduled] = useState(false)
-  const [scheduledEventData, setScheduledEventData] = useState(null)
+  const [_scheduledEventData, setScheduledEventData] = useState(null)
+  const [calendlyInitialized, setCalendlyInitialized] = useState(false)
+
+  // Initialize Calendly widget immediately on mount (hidden)
+  useEffect(() => {
+    // Try immediately first
+    if (window.Calendly && !calendlyInitialized) {
+      setCalendlyInitialized(true)
+      return
+    }
+
+    // If not ready, poll for Calendly to be available
+    const checkCalendly = () => {
+      if (window.Calendly && !calendlyInitialized) {
+        setCalendlyInitialized(true)
+      }
+    }
+
+    // Check every 100ms for up to 5 seconds
+    const interval = setInterval(checkCalendly, 100)
+    const timeout = setTimeout(() => clearInterval(interval), 5000)
+
+    return () => {
+      clearInterval(interval)
+      clearTimeout(timeout)
+    }
+  }, [calendlyInitialized])
 
   // Mark as animated after first render
   useEffect(() => {
@@ -70,9 +98,9 @@ export default function ContactForm() {
     }
   }, [meetingScheduled])
 
-  // Initialize Calendly inline widget when calendar is shown
+  // Initialize Calendly inline widget when ready (loads in background)
   useEffect(() => {
-    if (showCalendar && window.Calendly) {
+    if (calendlyInitialized && window.Calendly) {
       setCalendlyLoaded(false)
 
       // Listen for Calendly events
@@ -80,7 +108,10 @@ export default function ContactForm() {
         if (e.data.event && e.data.event.indexOf('calendly') === 0) {
           // Hide skeleton on event_type_viewed (page fully loaded)
           if (e.data.event === 'calendly.event_type_viewed') {
-            setCalendlyLoaded(true)
+            // Wait for Calendly iframe content to fully render, then instantly remove skeleton
+            setTimeout(() => {
+              setCalendlyLoaded(true)
+            }, 1500)
           }
 
           // Capture when meeting is scheduled
@@ -114,19 +145,23 @@ export default function ContactForm() {
 
       window.addEventListener('message', handleCalendlyMessage)
 
-      // Initialize Calendly widget
-      window.Calendly.initInlineWidget({
-        url: 'https://calendly.com/kllmmc23/30min',
-        parentElement: document.querySelector('.calendly-inline-widget'),
-        prefill: {},
-        utm: {}
-      })
+      // Initialize Calendly widget when shown
+      const widgetElement = document.querySelector('.calendly-inline-widget')
+
+      if (widgetElement) {
+        window.Calendly.initInlineWidget({
+          url: 'https://calendly.com/kllmmc23/30min?hide_gdpr_banner=1',
+          parentElement: widgetElement,
+          prefill: {},
+          utm: {}
+        })
+      }
 
       return () => {
         window.removeEventListener('message', handleCalendlyMessage)
       }
     }
-  }, [showCalendar])
+  }, [calendlyInitialized, aiResponse?.lead_id]) // Run when Calendly script is ready
 
   // Common email typos
   const emailTypos = {
@@ -364,22 +399,115 @@ export default function ContactForm() {
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
               Ready to Stop Wasting Time on Manual Work?
             </h2>
-            <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto">
-              Get a free automation audit. I'll analyze your needs and give you a personalized plan
-              with estimated time savings and ROI.
+            <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto mb-8">
+              Let's discuss how automation can save you 20+ hours per week and boost your ROI.
             </p>
-            <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm border border-primary-200 rounded-full text-sm font-medium text-primary-700">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-              AI-Powered Analysis in 3 Seconds
-            </div>
 
+            {/* Primary CTA: Book Strategy Call */}
+            {!showCalendar && !aiResponse && (
+              <div className="flex flex-col items-center gap-4">
+                <Button
+                  variant="primary"
+                  size="lg"
+                  className="w-full sm:w-auto"
+                  onClick={() => setShowCalendar(true)}
+                >
+                  Book Strategy Call
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </Button>
+                <p className="text-sm text-gray-600">
+                  Want a free AI analysis first?{' '}
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById('contact-form')?.scrollIntoView({ behavior: 'smooth' })}
+                    className="text-primary-600 hover:text-primary-700 font-medium underline"
+                  >
+                    Get your automation audit
+                  </button>
+                </p>
+              </div>
+            )}
           </div>
 
-          {/* Form or AI Response */}
-          {!aiResponse ? (
-            <form onSubmit={handleSubmit} className={`space-y-6 ${!hasAnimated ? 'animate-fade-in-up' : ''}`} style={!hasAnimated ? { animationDelay: '0.1s' } : {}}>
+          {/* Calendly Widget - ALWAYS in DOM, loads in background */}
+          <div className="-mx-4 sm:mx-0 relative">
+            {/* Calendly Embed - Use ONLY opacity to hide/show */}
+            <div
+              style={{
+                opacity: showCalendar && !meetingScheduled && calendlyLoaded ? '1' : '0',
+                pointerEvents: showCalendar && !meetingScheduled && calendlyLoaded ? 'auto' : 'none'
+              }}
+            >
+              <div
+                className="calendly-inline-widget w-full h-[calc(100vh-120px)] sm:h-[900px] overflow-hidden"
+                data-url="https://calendly.com/kllmmc23/30min"
+              ></div>
+            </div>
+
+            {/* Loading Skeleton - Shows when clicked but not loaded yet */}
+            {showCalendar && !calendlyLoaded && !meetingScheduled && (
+              <div className="absolute inset-0 w-full h-[calc(100vh-120px)] sm:h-[900px] bg-white z-10">
+                  <div className="w-full h-full overflow-hidden">
+                    <div className="p-4 sm:p-8 space-y-6 animate-pulse">
+                      {/* Header - Name and meeting title */}
+                      <div className="text-center space-y-3">
+                        <div className="h-5 bg-gray-200 rounded w-32 mx-auto"></div>
+                        <div className="h-8 bg-gray-300 rounded w-56 mx-auto"></div>
+                        <div className="flex items-center justify-center gap-4 mt-4">
+                          <div className="flex items-center gap-2">
+                            <div className="h-5 w-5 bg-gray-200 rounded-full"></div>
+                            <div className="h-4 bg-gray-200 rounded w-16"></div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="h-5 w-5 bg-gray-200 rounded-full"></div>
+                            <div className="h-4 bg-gray-200 rounded w-48"></div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Divider */}
+                      <div className="h-px bg-gray-200"></div>
+
+                      {/* Calendar title */}
+                      <div className="h-6 bg-gray-200 rounded w-48 mx-auto"></div>
+
+                      {/* Month navigation */}
+                      <div className="flex items-center justify-center gap-4">
+                        <div className="h-8 w-8 bg-gray-200 rounded"></div>
+                        <div className="h-6 bg-gray-300 rounded w-32"></div>
+                        <div className="h-8 w-8 bg-gray-200 rounded"></div>
+                      </div>
+
+                      {/* Calendar grid */}
+                      <div className="grid grid-cols-7 gap-2 px-4">
+                        {/* Day headers */}
+                        {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => (
+                          <div key={`header-${i}`} className="h-8 flex items-center justify-center">
+                            <div className="h-4 w-4 bg-gray-200 rounded"></div>
+                          </div>
+                        ))}
+                        {/* Calendar days */}
+                        {[...Array(35)].map((_, i) => (
+                          <div key={i} className="h-10 bg-gray-100 rounded hover:bg-gray-200 transition-colors"></div>
+                        ))}
+                      </div>
+
+                      {/* Timezone */}
+                      <div className="flex items-center justify-center gap-2 mt-6">
+                        <div className="h-5 w-5 bg-gray-200 rounded-full"></div>
+                        <div className="h-4 bg-gray-200 rounded w-40"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+          </div>
+
+          {/* Form */}
+          {!aiResponse && !showCalendar && !meetingScheduled ? (
+            <form id="contact-form" onSubmit={handleSubmit} className={`space-y-6 ${!hasAnimated ? 'animate-fade-in-up' : ''}`} style={!hasAnimated ? { animationDelay: '0.1s' } : {}}>
               {/* Card Container */}
               <div className={`sm:bg-white/80 sm:backdrop-blur-sm sm:border sm:border-gray-200 sm:rounded-3xl p-4 sm:p-8 md:p-10 sm:shadow-lg relative ${isSubmitting ? 'opacity-60 pointer-events-none' : ''}`}>
                 {/* Loading Overlay */}
@@ -800,88 +928,35 @@ export default function ContactForm() {
                     Looking forward to talking with you! 👋
                   </p>
 
-                  {/* Action Button */}
-                  <Button
-                    variant="primary"
-                    size="md"
-                    className="w-full sm:w-auto mx-auto"
-                    onClick={() => {
-                      // Reset everything to start fresh
-                      setAiResponse(null)
-                      setShowCalendar(false)
-                      setMeetingScheduled(false)
-                      setScheduledEventData(null)
-                    }}
-                  >
-                    Done
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </Button>
-                </div>
-              ) : !meetingScheduled ? (
-                /* Calendar view - No card on mobile, card on desktop */
-                <div className="sm:bg-gradient-to-br sm:from-primary-50 sm:to-accent-50 sm:border-2 sm:border-primary-200 sm:rounded-3xl sm:shadow-xl sm:p-6 -mx-4 sm:mx-0 relative">
-                  {/* Calendly Embed - Loads in background behind skeleton */}
-                  <div
-                    className="calendly-inline-widget w-full h-[calc(100vh-120px)] sm:h-[700px] sm:rounded-lg overflow-hidden"
-                    data-url="https://calendly.com/kllmmc23/30min"
-                  ></div>
-
-                  {/* Loading Skeleton - Sits on top of Calendly, fades out when loaded */}
-                  <div className={`absolute inset-0 bg-white sm:rounded-lg transition-opacity duration-500 ${calendlyLoaded ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-                    <div className="w-full h-full overflow-hidden">
-                      <div className="p-4 sm:p-8 space-y-6 animate-pulse">
-                        {/* Header - Name and meeting title */}
-                        <div className="text-center space-y-3">
-                          <div className="h-5 bg-gray-200 rounded w-32 mx-auto"></div>
-                          <div className="h-8 bg-gray-300 rounded w-56 mx-auto"></div>
-                          <div className="flex items-center justify-center gap-4 mt-4">
-                            <div className="flex items-center gap-2">
-                              <div className="h-5 w-5 bg-gray-200 rounded-full"></div>
-                              <div className="h-4 bg-gray-200 rounded w-16"></div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <div className="h-5 w-5 bg-gray-200 rounded-full"></div>
-                              <div className="h-4 bg-gray-200 rounded w-48"></div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Divider */}
-                        <div className="h-px bg-gray-200"></div>
-
-                        {/* Calendar title */}
-                        <div className="h-6 bg-gray-200 rounded w-48 mx-auto"></div>
-
-                        {/* Month navigation */}
-                        <div className="flex items-center justify-between px-4">
-                          <div className="h-8 w-8 bg-gray-200 rounded"></div>
-                          <div className="h-6 bg-gray-300 rounded w-32"></div>
-                          <div className="h-8 w-8 bg-gray-200 rounded"></div>
-                        </div>
-
-                        {/* Calendar grid */}
-                        <div className="grid grid-cols-7 gap-2">
-                          {/* Day headers */}
-                          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => (
-                            <div key={`header-${i}`} className="h-8 flex items-center justify-center">
-                              <div className="h-4 w-4 bg-gray-200 rounded"></div>
-                            </div>
-                          ))}
-                          {/* Calendar days */}
-                          {[...Array(35)].map((_, i) => (
-                            <div key={i} className="h-10 bg-gray-100 rounded hover:bg-gray-200 transition-colors"></div>
-                          ))}
-                        </div>
-
-                        {/* Timezone */}
-                        <div className="flex items-center justify-center gap-2 mt-6">
-                          <div className="h-5 w-5 bg-gray-200 rounded-full"></div>
-                          <div className="h-4 bg-gray-200 rounded w-40"></div>
-                        </div>
-                      </div>
-                    </div>
+                  {/* Action Buttons */}
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <Button
+                      variant="primary"
+                      size="md"
+                      onClick={() => {
+                        // Show form to get AI analysis
+                        setShowCalendar(false)
+                        setMeetingScheduled(false)
+                      }}
+                    >
+                      Get Free AI Analysis
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                      </svg>
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      size="md"
+                      onClick={() => {
+                        // Reset everything
+                        setAiResponse(null)
+                        setShowCalendar(false)
+                        setMeetingScheduled(false)
+                        setScheduledEventData(null)
+                      }}
+                    >
+                      Done
+                    </Button>
                   </div>
                 </div>
               ) : null}

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import WorkflowDiagram from './WorkflowDiagram'
 import { Button, Container, Section } from './ui'
 
-export default function Hero() {
+export default function Hero({ onBookCall }) {
   const [stats, setStats] = useState(null)
   const [currentStatIndex, setCurrentStatIndex] = useState(0)
 
@@ -92,14 +92,9 @@ export default function Hero() {
                 variant="primary"
                 size="md"
                 icon={<ArrowIcon />}
-                onClick={() => {
-                  const contactSection = document.getElementById('contact')
-                  if (contactSection) {
-                    contactSection.scrollIntoView({ behavior: 'smooth' })
-                  }
-                }}
+                onClick={onBookCall}
               >
-                Get Free Automation Audit
+                Book a Strategy Call
               </Button>
             </div>
 
