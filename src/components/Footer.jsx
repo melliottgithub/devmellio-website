@@ -11,8 +11,8 @@ export default function Footer() {
           <div className="mb-8">
             <h3 className="text-2xl font-bold mb-4">Michael Elliott</h3>
             <p className="text-gray-400 mb-6 max-w-2xl mx-auto">
-              Private bachata lessons from an instructor trained by world-class legends.
-              Certified in Island Touch.
+              Social bachata training and courses. Learn to dance with energy, passion & authentic connection.
+              Trained by world-class legends. Certified in Island Touch.
             </p>
 
             {/* Social & Links */}

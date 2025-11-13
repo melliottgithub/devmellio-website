@@ -20,14 +20,18 @@ export default function DanceHero2026({ onBookCall }) {
             <div className="text-center space-y-6 mb-8">
               <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white leading-none tracking-tight">
                 <span className="bg-gradient-to-r from-blue-300 via-sky-200 to-indigo-300 bg-clip-text text-transparent">
-                  World-Class
+                  Master the Art
                 </span>
                 <br/>
-                <span className="text-white">Bachata Training</span>
+                <span className="text-white">of Connection</span>
               </h1>
 
               <p className="text-xl sm:text-2xl text-gray-300 font-light">
-                Private Lessons with Michael Elliott
+                Social Bachata Training with Michael Elliott
+              </p>
+
+              <p className="text-lg text-gray-400 mt-4 max-w-2xl mx-auto">
+                Learn to dance with passion, energy & authentic connection
               </p>
             </div>
 
@@ -37,13 +41,13 @@ export default function DanceHero2026({ onBookCall }) {
                 onClick={onBookCall}
                 className="group relative inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-500 hover:via-indigo-500 hover:to-blue-600 text-white text-xl font-bold rounded-full shadow-2xl hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105"
               >
-                <span>Book Private Lesson Now</span>
+                <span>Start Your Journey</span>
                 <svg className="w-6 h-6 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </button>
               <p className="mt-4 text-sm text-gray-400">
-                In-Person Lessons • All Skill Levels • Flexible Scheduling
+                In-Person Training • Social Dance Courses • All Levels Welcome
               </p>
             </div>
 
@@ -98,13 +102,13 @@ export default function DanceHero2026({ onBookCall }) {
             {/* Achievements */}
             <div className="flex flex-wrap justify-center gap-3 mb-10">
               <div className="backdrop-blur-md bg-blue-500/20 border border-blue-400/30 rounded-full px-4 py-2 text-sm text-blue-200">
-                ✨ J&J Competition Winner
+                ✨ Competition Winner
               </div>
               <div className="backdrop-blur-md bg-indigo-500/20 border border-indigo-400/30 rounded-full px-4 py-2 text-sm text-indigo-200">
                 🎓 Certified Island Touch
               </div>
               <div className="backdrop-blur-md bg-sky-500/20 border border-sky-400/30 rounded-full px-4 py-2 text-sm text-sky-200">
-                💃 Social Dance Technique
+                💃 Passionate Connections
               </div>
             </div>
 
@@ -112,7 +116,7 @@ export default function DanceHero2026({ onBookCall }) {
 
           {/* Bottom trust line */}
           <div className="mt-8 text-center text-sm text-gray-500">
-            <p>Continuously training with the world's best • Sharing knowledge through private lessons</p>
+            <p>Elevate your social dance • Master flow, musicality & authentic connection</p>
           </div>
         </div>
       </div>
