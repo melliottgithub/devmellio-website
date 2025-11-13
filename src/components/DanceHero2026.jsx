@@ -23,7 +23,7 @@ export default function DanceHero2026({ onBookCall }) {
                   Master the Art
                 </span>
                 <br/>
-                <span className="text-white">of Connection</span>
+                <span className="text-white">of Social Dancing</span>
               </h1>
 
               <p className="text-xl sm:text-2xl text-gray-300 font-light">
