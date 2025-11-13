@@ -3,6 +3,19 @@ import { Button } from './ui'
 export default function DanceHero2026({ onBookCall }) {
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 overflow-hidden">
+      {/* Background Image */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-15"
+          style={{
+            backgroundImage: 'url(https://demonslayer-anime.com/hta/assets/img/img_kv.jpg)',
+            filter: 'blur(3px)'
+          }}
+        ></div>
+        {/* Gradient overlay for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-950/85 via-blue-950/85 to-slate-900/85"></div>
+      </div>
+
       {/* Animated gradient orbs - sophisticated background */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-blue-500/10 to-transparent rounded-full blur-3xl animate-pulse"></div>
