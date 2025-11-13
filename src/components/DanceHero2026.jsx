@@ -27,7 +27,15 @@ export default function DanceHero2026({ onBookCall }) {
               </h1>
 
               <p className="text-xl sm:text-2xl text-gray-300 font-light">
-                Social Bachata Training with Michael Elliott
+                Social Bachata Training with{' '}
+                <a
+                  href="https://instagram.com/wedancebachata"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-400 hover:text-blue-300 transition-colors"
+                >
+                  @wedancebachata
+                </a>
               </p>
 
               <p className="text-lg text-gray-400 mt-4 max-w-2xl mx-auto">
