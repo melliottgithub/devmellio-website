@@ -6,14 +6,14 @@ export default function DanceHero2026({ onBookCall }) {
       {/* Background Image */}
       <div className="absolute inset-0 overflow-hidden">
         <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-15"
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40"
           style={{
             backgroundImage: 'url(https://demonslayer-anime.com/hta/assets/img/img_kv.jpg)',
-            filter: 'blur(3px)'
+            filter: 'blur(1px)'
           }}
         ></div>
         {/* Gradient overlay for better text readability */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-950/85 via-blue-950/85 to-slate-900/85"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-950/70 via-blue-950/70 to-slate-900/70"></div>
       </div>
 
       {/* Animated gradient orbs - sophisticated background */}
@@ -27,10 +27,19 @@ export default function DanceHero2026({ onBookCall }) {
         <div className="max-w-5xl w-full">
 
           {/* Main content card with frosted glass effect */}
-          <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl p-8 sm:p-12 md:p-16 shadow-2xl">
+          <div className="relative backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl p-8 sm:p-12 md:p-16 shadow-2xl overflow-hidden">
+            {/* Background image inside card */}
+            <div
+              className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20 rounded-3xl"
+              style={{
+                backgroundImage: 'url(https://demonslayer-anime.com/hta/assets/img/img_kv.jpg)',
+                filter: 'blur(0px)'
+              }}
+            ></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-slate-950/60 via-blue-950/60 to-slate-900/60 rounded-3xl"></div>
 
             {/* Headline - Kinetic feel */}
-            <div className="text-center space-y-6 mb-8">
+            <div className="relative z-10 text-center space-y-6 mb-8">
               <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white leading-none tracking-tight">
                 <span className="bg-gradient-to-r from-blue-300 via-sky-200 to-indigo-300 bg-clip-text text-transparent">
                   Master the Art
@@ -57,7 +66,7 @@ export default function DanceHero2026({ onBookCall }) {
             </div>
 
             {/* CTA - FIRST - Above everything else */}
-            <div className="text-center mb-12">
+            <div className="relative z-10 text-center mb-12">
               <button
                 onClick={onBookCall}
                 className="group relative inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-500 hover:via-indigo-500 hover:to-blue-600 text-white text-xl font-bold rounded-full shadow-2xl hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105"
@@ -73,7 +82,7 @@ export default function DanceHero2026({ onBookCall }) {
             </div>
 
             {/* Credentials Grid - All the info */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+            <div className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
               <div className="backdrop-blur-md bg-white/5 border border-white/10 rounded-xl p-4 text-center hover:bg-white/10 transition-all duration-300 hover:-translate-y-1">
                 <div className="text-3xl sm:text-4xl font-bold text-blue-400 mb-1">150+</div>
                 <div className="text-xs sm:text-sm text-gray-400">Private Hours</div>
@@ -93,7 +102,7 @@ export default function DanceHero2026({ onBookCall }) {
             </div>
 
             {/* Instructors - Highlighted */}
-            <div className="backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl p-6 mb-8">
+            <div className="relative z-10 backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl p-6 mb-8">
               <h3 className="text-sm font-semibold text-gray-400 mb-4 text-center">TRAINING EXTENSIVELY WITH THE LEGENDS</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-center sm:text-left">
                 <div className="space-y-2">
@@ -121,7 +130,7 @@ export default function DanceHero2026({ onBookCall }) {
             </div>
 
             {/* Achievements */}
-            <div className="flex flex-wrap justify-center gap-3 mb-10">
+            <div className="relative z-10 flex flex-wrap justify-center gap-3 mb-10">
               <div className="backdrop-blur-md bg-blue-500/20 border border-blue-400/30 rounded-full px-4 py-2 text-sm text-blue-200">
                 ✨ Competition Winner
               </div>
