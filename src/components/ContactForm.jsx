@@ -429,7 +429,8 @@ export default function ContactForm({ showCalendar: showCalendarProp, setShowCal
             >
               <div
                 id="cal-booking-widget"
-                className="w-full h-[calc(100vh-120px)] sm:h-[900px] overflow-hidden"
+                className="w-full h-[calc(100vh-120px)] sm:h-[900px] overflow-auto"
+                style={{ WebkitOverflowScrolling: 'touch' }}
               ></div>
             </div>
 
